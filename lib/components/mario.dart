@@ -6,8 +6,9 @@ import 'package:super_mario/components/movements.dart';
 class Mario extends StatelessWidget {
   final direction;
   final run;
+  final form;
 
-  Mario({this.direction, this.run});
+  Mario({this.direction, this.run, this.form});
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +17,7 @@ class Mario extends StatelessWidget {
         height: 100,
         child: Movement(
           run: run,
+          form: form,
         )
       );
     } else {
@@ -26,6 +28,7 @@ class Mario extends StatelessWidget {
           height: 100,
           child: Movement(
             run: run,
+            form: form,
           )
         ),
       );

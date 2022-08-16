@@ -1,11 +1,13 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:google_fonts/google_fonts.dart';
 
 class InformationBar extends StatelessWidget {
   final lives;
   final timer;
+  final points;
   var font = GoogleFonts.pressStart2p(
     textStyle: TextStyle(
       color: Colors.white,
@@ -13,7 +15,7 @@ class InformationBar extends StatelessWidget {
     )
   );
 
-  InformationBar({this.lives, this.timer});
+  InformationBar({this.lives, this.timer, this.points});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class InformationBar extends StatelessWidget {
             Column(
               children: [
                 Text(
-                  'MARIO',
+                  'LIVES',
                   textAlign: TextAlign.center,
                   style: font,
                 ),
@@ -41,13 +43,13 @@ class InformationBar extends StatelessWidget {
             Column(
               children: [
                 Text(
-                  'WORLD',
+                  'POINTS',
                   textAlign: TextAlign.center,
                   style: font,
                 ),
                 SizedBox(height: 10,),
                 Text(
-                  '1-1',
+                  points.toString(),
                   textAlign: TextAlign.center,
                   style: font,
                 ),

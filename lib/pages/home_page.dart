@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:google_fonts/google_fonts.dart';
 import 'package:super_mario/components/information.dart';
 import 'package:super_mario/components/jump.dart';
+import 'package:super_mario/components/mushroom.dart';
 import 'dart:async';
 
 import '../components/buttons.dart';
@@ -15,22 +17,37 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static double marioX = 0;
-  static double marioY = 1.065;
+  static double marioY = 1.12;
+  static double shortY = 1.12;
+  static double grownY = 1.065;
+  static double currentY = shortY;
+  static double mushX = 0.75;
+  static double mushY = 1;
   double time = 0;
   double height = 0;
   double initialHeight = marioY;
   String direction = 'right';
+  String form = 'short';
   int run = 0;
   int lives = 3;
-  int countDown = 10;
+  int countDown = 999;
+  int points = 0;
+  int jumps = 0;
   bool gameOver = false;
   bool jumping = false;
   var font = GoogleFonts.pressStart2p(
-    textStyle: TextStyle(
-      color: Colors.white,
-      fontSize: 40
-    )
-  );
+      textStyle: TextStyle(color: Colors.white, fontSize: 40));
+
+  void eatMushroom() {
+    if ((marioX - mushX).abs() < 0.15 && (marioY - mushY).abs() < 0.15) {
+      setState(() {
+        mushX = 2;
+        form = 'grown';
+        currentY = grownY;
+        marioY = currentY;
+      });
+    }
+  }
 
   void countDownTimer() {
     Timer.periodic(Duration(seconds: 1), (timer) {
@@ -56,13 +73,21 @@ class _HomePageState extends State<HomePage> {
     if (jumping == false) {
       jumping = true;
       preJump();
+      jumps += 1;
+
+      if (pointsCounter()) {
+        setState(() {
+          points += 1;
+        });
+      }
+
       Timer.periodic(Duration(milliseconds: 50), (timer) {
         time += 0.05;
         height = -4.9 * time * time + 5 * time;
 
         if (initialHeight - height > 1) {
           setState(() {
-            marioY = 1.065;
+            marioY = currentY;
             jumping = false;
           });
           timer.cancel();
@@ -79,12 +104,13 @@ class _HomePageState extends State<HomePage> {
     direction = 'left';
 
     Timer.periodic(Duration(milliseconds: 100), (timer) {
+      eatMushroom();
       if (Buttons(
             onRunningChanged: (running) {
               isRunning(running);
             },
           ).isHoldingButtonDown() ==
-          true) {
+          true && marioX - 0.02 > -1) {
         setState(() {
           marioX -= 0.02;
           if (run < 4) {
@@ -103,12 +129,13 @@ class _HomePageState extends State<HomePage> {
     direction = 'right';
 
     Timer.periodic(Duration(milliseconds: 100), (timer) {
+      eatMushroom();
       if (Buttons(
             onRunningChanged: (running) {
               isRunning(running);
             },
           ).isHoldingButtonDown() ==
-          true) {
+          true && marioX + 0.02 < 1) {
         setState(() {
           marioX += 0.02;
           if (run < 4) {
@@ -127,6 +154,14 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       run = running;
     });
+  }
+
+  bool pointsCounter() {
+    if (jumps > 0 && jumps % 2 == 0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @override
@@ -153,25 +188,29 @@ class _HomePageState extends State<HomePage> {
                   child: jumping
                       ? JumpingMario(
                           direction: direction,
+                          form: form,
                         )
                       : Mario(
                           direction: direction,
                           run: run,
+                          form: form,
                         ),
                 ),
               ),
               InformationBar(
                 timer: countDown,
                 lives: lives,
+                points: points,
               ),
               gameOver
-              ? Center(
-                child: Text(
-                  'GameOver',
-                  style: font,
-                ),
-              )
-              : Text('')
+                  ? Center(
+                      child: Text(
+                        'GameOver',
+                        style: font,
+                      ),
+                    )
+                  : Text(''),
+              Container(alignment: Alignment(mushX, mushY), child: Mushroom())
             ]),
           ),
           Container(
